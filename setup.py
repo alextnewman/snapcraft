@@ -18,8 +18,31 @@
 import codecs
 import os
 import re
+import sys
 
-from setuptools import setup
+
+if sys.platform == "win32":
+	from cx_Freeze import setup, Executable
+else:
+	from setuptools import setup
+	
+
+# cx_Freeze relevant options
+build_exe_options = {
+	"packages": [
+		"os", 
+		"six", 
+		"urllib", 
+		"urllib3", 
+		"pkg_resources"
+	], 
+	"excludes": ["tkinter"]
+	}
+	
+exe = Executable(
+	script="bin/snapcraft", 
+	base=None
+	)
 
 version = 'devel'
 # look/set what version we have
@@ -57,6 +80,8 @@ setup(
             'snapcraft-parser = snapcraft.internal.parser:main',
         ],
     },
+	options={"build_exe": build_exe_options},
+	executables=[exe],
     data_files=[
         ('share/snapcraft/schema',
             ['schema/' + x for x in os.listdir('schema')]),
