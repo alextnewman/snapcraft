@@ -21,28 +21,40 @@ import re
 import sys
 
 
-if sys.platform == "win32":
+if sys.platform == 'win32':
 	from cx_Freeze import setup, Executable
+	
+	# cx_Freeze relevant options
+	build_exe_options = {
+		'packages': [
+			'pkg_resources',
+			'pymacaroons',
+			'click',
+			'responses',
+			'configparser',
+			'docopt',
+			'cffi',
+		],
+		'include_files' : [
+			('tour', os.path.join('share', 'snapcraft', 'tour')),
+			('libraries', os.path.join('share', 'snapcraft', 'libraries')),
+			('schema', os.path.join('share', 'snapcraft', 'schema')),
+		],
+	}
+		
+	exe = Executable(
+		script='bin/snapcraft', 
+		base=None # console subsystem
+	)
+	
 else:
 	from setuptools import setup
 	
-
-# cx_Freeze relevant options
-build_exe_options = {
-	"packages": [
-		"os", 
-		"six", 
-		"urllib", 
-		"urllib3", 
-		"pkg_resources"
-	], 
-	"excludes": ["tkinter"]
-	}
+	build_exe_options = None
+	exe = None
 	
-exe = Executable(
-	script="bin/snapcraft", 
-	base=None
-	)
+
+
 
 version = 'devel'
 # look/set what version we have
@@ -80,7 +92,7 @@ setup(
             'snapcraft-parser = snapcraft.internal.parser:main',
         ],
     },
-	options={"build_exe": build_exe_options},
+	options={'build_exe': build_exe_options},
 	executables=[exe],
     data_files=[
         ('share/snapcraft/schema',
